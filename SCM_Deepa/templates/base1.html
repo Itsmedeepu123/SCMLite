@@ -1,0 +1,75 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', path='admin.css') }}">
+
+    {% block head_extra %}{% endblock %}
+</head>
+
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="brand">
+            <img src="/static/logo.jpg" alt="Logo" />
+            <h3>Exafluence</h3>
+        </div>
+
+        <div class="sidebar-links">
+            <ul class="nav-links">
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/user-profile">User Profile</a></li>
+		        <li><a href="/Manageusers">Manage Users</a></li>
+                <li><a href="/allshipment">All Shipment</a></li>
+                <li><a href="/create-shipment">New Shipment</a></li>
+		        <li><a href="/device-data">Device Data</a></li>
+                <li><a href="/admin-ratings">User Ratings</a></li>
+            </ul>
+
+            <div class="logout-container">
+                <a class="logout-btn" href="/logout">Logout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+    // Hide admin-only navigation links for non-admin users
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get user role from cookie
+        const userRole = getCookie('user_role');
+        
+        // If user is not admin, hide admin-only links
+        if (userRole !== 'admin') {
+            // Hide Manage Users link
+            const manageUsersLink = document.querySelector('a[href="/Manageusers"]');
+            if (manageUsersLink) {
+                manageUsersLink.parentElement.style.display = 'none';
+            }
+            
+            // Hide User Ratings link
+            const userRatingsLink = document.querySelector('a[href="/admin-ratings"]');
+            if (userRatingsLink) {
+                userRatingsLink.parentElement.style.display = 'none';
+            }
+        }
+    });
+    
+    // Utility function to get cookie value
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+</script>
+</div>
+</body>
+</html>

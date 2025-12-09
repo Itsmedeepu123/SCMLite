@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="user-profile">
+    <h2>User Profile</h2>
+    
+    <!-- Check if user data is available -->
+    {% if user %}
+        <p><strong>Name:</strong> {{ user.name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        
+        <!-- MFA Section -->
+        <div class="mfa-section">
+            <h3>Multi-Factor Authentication</h3>
+            {% if user.role == "admin" %}
+                <p>As an admin, you can optionally enable MFA for your account.</p>
+                {% if user.mfa_enabled %}
+                    <p>MFA is currently <strong>enabled</strong> on your account.</p>
+                    <p>Scan the QR code below with your authenticator app to ensure you can access your account.</p>
+                    <form method="POST" action="/mfa/disable" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">Disable MFA</button>
+                    </form>
+                    <a href="/mfa/setup" class="btn btn-secondary">Reconfigure MFA</a>
+                {% else %}
+                    <p>MFA is currently <strong>disabled</strong> on your account.</p>
+                    <p>Add an extra layer of security to your account by enabling Multi-Factor Authentication.</p>
+                    <a href="/mfa/setup" class="btn btn-primary">Enable MFA</a>
+                {% endif %}
+            {% elif user.mfa_enabled %}
+                <p>MFA is currently <strong>enabled</strong> on your account.</p>
+                <p>Scan the QR code below with your authenticator app to ensure you can access your account.</p>
+                <form method="POST" action="/mfa/disable" style="display: inline;">
+                    <button type="submit" class="btn btn-warning">Disable MFA</button>
+                </form>
+                <a href="/mfa/setup" class="btn btn-secondary">Reconfigure MFA</a>
+            {% else %}
+                <p>MFA is currently <strong>disabled</strong> on your account.</p>
+                <p>Add an extra layer of security to your account by enabling Multi-Factor Authentication.</p>
+                <a href="/mfa/setup" class="btn btn-primary">Enable MFA</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="error-message">
+            <h3>Authentication Required</h3>
+            <p>You must be logged in to view your profile.</p>
+            <a href="/login" class="btn btn-primary">Go to Login</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Rating Widget -->
+<div class="rating-widget">
+    <div class="rating-title">Rate Your Experience</div>
+    <form id="rating-form">
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5" />
+            <label for="star5" title="5 stars">&#9733;</label>
+            
+            <input type="radio" id="star4" name="rating" value="4" />
+            <label for="star4" title="4 stars">&#9733;</label>
+            
+            <input type="radio" id="star3" name="rating" value="3" />
+            <label for="star3" title="3 stars">&#9733;</label>
+            
+            <input type="radio" id="star2" name="rating" value="2" />
+            <label for="star2" title="2 stars">&#9733;</label>
+            
+            <input type="radio" id="star1" name="rating" value="1" />
+            <label for="star1" title="1 star">&#9733;</label>
+        </div>
+        
+        <div class="rating-comment">
+            <textarea name="comment" placeholder="Leave your feedback here..."></textarea>
+        </div>
+        
+        <button type="submit" class="rating-submit">Submit Rating</button>
+    </form>
+    
+    <div class="rating-result" id="rating-result">
+        Thank you for your feedback!
+    </div>
+</div>
+
+{% if user %}
+<div class="user-shipments">
+    <h3>Your Shipments</h3>
+    {% if shipments %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Shipment Number</th>
+                    <th>Route</th>
+                    <th>Device</th>
+                    <th>PO Number</th>
+                    <th>NDC Number</th>
+                    <th>Serial Number</th>
+                    <th>Goods Type</th>
+                    <th>Expected Delivery</th>
+                    <th>Delivery Number</th>
+                    <th>Batch ID</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shipment in shipments %}
+                <tr>
+                    <td>{{ shipment.shipmentNumber }}</td>
+                    <td>{{ shipment.route }}</td>
+                    <td>{{ shipment.device }}</td>
+                    <td>{{ shipment.poNumber }}</td>
+                    <td>{{ shipment.ndcNumber }}</td>
+                    <td>{{ shipment.serialNumber }}</td>
+                    <td>{{ shipment.goodsType }}</td>
+                    <td>{{ shipment.expected_delivery_date }}</td>
+                    <td>{{ shipment.deliveryNumber }}</td>
+                    <td>{{ shipment.batchId }}</td>
+                    <td>{{ shipment.shipmentDesc }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No shipments found for this user.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+    document.getElementById('rating-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get selected rating
+        const rating = document.querySelector('input[name="rating"]:checked');
+        const comment = document.querySelector('textarea[name="comment"]').value;
+        
+        if (!rating) {
+            alert('Please select a rating');
+            return;
+        }
+        
+        // Send data to server
+        fetch('/submit-rating', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'rating': rating.value,
+                'comment': comment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Show success message
+                document.getElementById('rating-result').style.display = 'block';
+                
+                // Reset form
+                this.reset();
+            } else {
+                alert('Error submitting rating: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting rating');
+        });
+    });
+</script>
+
+<style>
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.mfa-section {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px 0;
+    color: #721c24;
+}
+
+.error-message h3 {
+    margin-top: 0;
+}
+</style>
+{% endblock %}
