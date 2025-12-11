@@ -1,40 +1,88 @@
-{% extends "base1.html" %}
+{% extends "base.html" %}
 
-{% block title %}All Shipment{% endblock %}
-
-{% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', path='allshipments.css') }}">
-
-{% endblock %}
+{% block title %}All Shipments{% endblock %}
 
 {% block content %}
-<h1>All Shipments</h1>
+<style>
+    .filter-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+    }
+    
+    .filter-section input, .filter-section button {
+        margin-right: 10px;
+        padding: 5px 10px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+        position: sticky;
+        top: 0;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .btn {
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 3px;
+        display: inline-block;
+    }
+    
+    .btn-edit {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
 
-<!-- Top-right corner buttons -->
-<div class="table-actions">
-    <a href="#" class="edit-btn" onclick="handleEditSelected()">Edit Selected</a>
-    <a href="#" class="delete-btn" onclick="handleDeleteSelected()">Delete Selected</a>
+<h2>All Shipments</h2>
+
+<div class="filter-section">
+    <form method="GET" action="/allshipment">
+        <label for="created_by">Filter by Created By:</label>
+        <input type="text" id="created_by" name="created_by" value="{{ created_by }}" placeholder="Enter username">
+        <button type="submit">Filter</button>
+        <a href="/allshipment" class="btn btn-edit">Clear Filter</a>
+    </form>
 </div>
 
-<!-- Search by Created By -->
-<form method="get" action="/allshipment" style="margin-bottom: 1em;">
-    <input type="text" name="created_by" placeholder="Search by Created By" value="{{ created_by }}">
-    <button type="submit">Search</button>
-</form>
-
-
-
-<!-- Shipments Table with selection -->
-<form id="shipment-form" method="post">
-    <div class="shipments-table-container">
-        <table class="shipments-table">
+<form id="shipment-form" method="POST">
+    <div class="table-responsive">
+        <table border="1">
             <thead>
                 <tr>
                     <th>Select</th>
                     <th>Shipment Number</th>
-                    <th>created_by</th>
+                    <th>Created By</th>
                     <th>Route</th>
-                    <th>Device</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
                     <th>PO Number</th>
                     <th>NDC</th>
                     <th>Serial Number</th>
@@ -51,7 +99,8 @@
                     <td>{{ shipment.shipmentNumber }}</td>
                     <td>{{ shipment.created_by }}</td>
                     <td>{{ shipment.route }}</td>
-                    <td>{{ shipment.device }}</td>
+                    <td>{{ shipment.origin }}</td>
+                    <td>{{ shipment.destination }}</td>
                     <td>{{ shipment.poNumber }}</td>
                     <td>{{ shipment.ndcNumber }}</td>
                     <td>{{ shipment.serialNumber }}</td>

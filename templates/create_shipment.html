@@ -50,21 +50,26 @@
           <label for="route">Select Route</label>
           <select id="route" name="route" required>
             <option value="" disabled selected>Select Route</option>
-            <option value="Route A">Route A</option>
-            <option value="Route B">Route B</option>
-            <option value="Route C">Route C</option>
-            <option value="Route D">Route D</option>
+            <option value="Chennai-Mumbai">Chennai-Mumbai</option>
+            <option value="Mumbai-Delhi">Mumbai-Delhi</option>
+            <option value="Delhi-Kolkata">Delhi-Kolkata</option>
+            <option value="Kolkata-Chennai">Kolkata-Chennai</option>
+            <option value="Chennai-Hyderabad">Chennai-Hyderabad</option>
+            <option value="Hyderabad-Bangalore">Hyderabad-Bangalore</option>
+            <option value="Bangalore-Delhi">Bangalore-Delhi</option>
+            <option value="Mumbai-Kolkata">Mumbai-Kolkata</option>
+            
           </select>
         </div>
 
         <div class="form-group">
-          <label for="device">Device</label>
-          <select id="device" name="device" required>
-            <option value="" disabled selected>Select Device</option>
-            <option value="Device 1">Device 1</option>
-            <option value="Device 2">Device 2</option>
-            <option value="Device 3">Device 3</option>
-          </select>
+          <label for="origin">Origin</label>
+          <input type="text" id="origin" name="origin" required>
+        </div>
+
+        <div class="form-group">
+          <label for="destination">Destination</label>
+          <input type="text" id="destination" name="destination" required>
         </div>
 
         <div class="form-group">
@@ -86,9 +91,12 @@
           <label for="goodsType">Goods Type</label>
           <select id="goodsType" name="goodsType" required>
             <option value="" disabled selected>Select Goods Type</option>
-            <option value="Goods1">Goods1</option>
-            <option value="Goods2">Goods2</option>
-            <option value="Goods3">Goods3</option>
+            <option value="Pharma">Pharma</option>
+            <option value="Food">Food</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Chemicals">Chemicals</option>
+            <option value="Clothes">Clothes</option>
+            <option value="Beauty Products">Beauty Produts</option>
             <option value="Other">Other</option>
           </select>
         </div>
@@ -147,7 +155,7 @@
       }
 
       const requiredFields = [
-        'shipmentNumber', 'route', 'device', 'poNumber', 'ndcNumber', 
+        'shipmentNumber', 'route', 'origin', 'destination', 'poNumber', 'ndcNumber', 
         'serialNumber', 'goodsType', 'deliveryDate', 'deliveryNumber', 'batchId', 'shipmentDesc'
       ];
 

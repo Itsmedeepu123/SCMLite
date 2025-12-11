@@ -3,89 +3,279 @@
 {% block title %}User Profile{% endblock %}
 
 {% block content %}
-<div class="user-profile">
-    <h2>User Profile</h2>
+<style>
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
     
-    <!-- Check if user data is available -->
-    {% if user %}
+    .profile-info {
+        flex: 1;
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .btn:hover {
+        opacity: 0.8;
+    }
+    
+    .section {
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .mfa-section {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .error-message {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 20px 0;
+        color: #721c24;
+    }
+    
+    .error-message h3 {
+        margin-top: 0;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #e9ecef;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    
+    .rating-section {
+        background-color: #e9f7ef;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .rating-section h3 {
+        margin-top: 0;
+        color: #155724;
+    }
+    
+    .rating-options {
+        display: flex;
+        gap: 15px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+    }
+    
+    .rating-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .rating-option:hover {
+        border-color: #007bff;
+        background-color: #f0f8ff;
+    }
+    
+    .rating-option.selected {
+        border-color: #007bff;
+        background-color: #e6f2ff;
+        transform: scale(1.05);
+    }
+    
+    .rating-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .rating-label {
+        font-size: 14px;
+    }
+    
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .submit-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+    
+    .submit-btn:hover {
+        background-color: #218838;
+    }
+</style>
+
+<div class="profile-header">
+    <div class="profile-info">
+        <h1>User Profile</h1>
+        {% if user %}
         <p><strong>Name:</strong> {{ user.name }}</p>
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>Role:</strong> {{ user.role }}</p>
-        
-        <!-- MFA Section -->
-        <div class="mfa-section">
-            <h3>Multi-Factor Authentication</h3>
-            {% if user.role == "admin" %}
-                <p>As an admin, you can optionally enable MFA for your account.</p>
-                {% if user.mfa_enabled %}
-                    <p>MFA is currently <strong>enabled</strong> on your account.</p>
-                    <p>Scan the QR code below with your authenticator app to ensure you can access your account.</p>
-                    <form method="POST" action="/mfa/disable" style="display: inline;">
-                        <button type="submit" class="btn btn-warning">Disable MFA</button>
-                    </form>
-                    <a href="/mfa/setup" class="btn btn-secondary">Reconfigure MFA</a>
-                {% else %}
-                    <p>MFA is currently <strong>disabled</strong> on your account.</p>
-                    <p>Add an extra layer of security to your account by enabling Multi-Factor Authentication.</p>
-                    <a href="/mfa/setup" class="btn btn-primary">Enable MFA</a>
-                {% endif %}
-            {% elif user.mfa_enabled %}
-                <p>MFA is currently <strong>enabled</strong> on your account.</p>
-                <p>Scan the QR code below with your authenticator app to ensure you can access your account.</p>
-                <form method="POST" action="/mfa/disable" style="display: inline;">
-                    <button type="submit" class="btn btn-warning">Disable MFA</button>
-                </form>
-                <a href="/mfa/setup" class="btn btn-secondary">Reconfigure MFA</a>
-            {% else %}
-                <p>MFA is currently <strong>disabled</strong> on your account.</p>
-                <p>Add an extra layer of security to your account by enabling Multi-Factor Authentication.</p>
-                <a href="/mfa/setup" class="btn btn-primary">Enable MFA</a>
-            {% endif %}
-        </div>
-    {% else %}
-        <div class="error-message">
-            <h3>Authentication Required</h3>
-            <p>You must be logged in to view your profile.</p>
-            <a href="/login" class="btn btn-primary">Go to Login</a>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
+    <div class="profile-actions">
+        <a href="/logout" class="btn btn-secondary">Logout</a>
+    </div>
 </div>
 
-<!-- Rating Widget -->
-<div class="rating-widget">
-    <div class="rating-title">Rate Your Experience</div>
-    <form id="rating-form">
-        <div class="star-rating">
-            <input type="radio" id="star5" name="rating" value="5" />
-            <label for="star5" title="5 stars">&#9733;</label>
+<!-- MFA Section -->
+{% if user and user.role != 'admin' %}
+<div class="mfa-section">
+    <h3>Multi-Factor Authentication</h3>
+    {% if user.mfa_enabled %}
+        <p>MFA is currently <strong>enabled</strong> on your account.</p>
+        <form action="/disable-mfa" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-warning">Disable MFA</button>
+        </form>
+    {% else %}
+        <p>MFA is currently <strong>disabled</strong> on your account.</p>
+        <a href="/setup-mfa" class="btn btn-primary">Enable MFA</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Error Message (if any) -->
+{% if error %}
+<div class="error-message">
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+</div>
+{% endif %}
+
+<!-- Rating Submission Form -->
+<div class="rating-section">
+    <h3>We Value Your Feedback</h3>
+    <p>Please share your experience with our service:</p>
+    
+    <form id="rating-form" method="post" action="/submit-rating">
+        <div>
+            <label>Select your rating:</label>
+            <div class="rating-options">
+                <div class="rating-option" data-value="1">
+                    <div class="rating-value">1</div>
+                    <div class="rating-label">Poor</div>
+                </div>
+                
+                <div class="rating-option" data-value="2">
+                    <div class="rating-value">2</div>
+                    <div class="rating-label">Fair</div>
+                </div>
+                
+                <div class="rating-option" data-value="3">
+                    <div class="rating-value">3</div>
+                    <div class="rating-label">Good</div>
+                </div>
+                
+                <div class="rating-option" data-value="4">
+                    <div class="rating-value">4</div>
+                    <div class="rating-label">Very Good</div>
+                </div>
+                
+                <div class="rating-option" data-value="5">
+                    <div class="rating-value">5</div>
+                    <div class="rating-label">Excellent</div>
+                </div>
+            </div>
             
-            <input type="radio" id="star4" name="rating" value="4" />
-            <label for="star4" title="4 stars">&#9733;</label>
-            
-            <input type="radio" id="star3" name="rating" value="3" />
-            <label for="star3" title="3 stars">&#9733;</label>
-            
-            <input type="radio" id="star2" name="rating" value="2" />
-            <label for="star2" title="2 stars">&#9733;</label>
-            
-            <input type="radio" id="star1" name="rating" value="1" />
-            <label for="star1" title="1 star">&#9733;</label>
+            <input type="hidden" id="rating" name="rating" value="">
         </div>
         
-        <div class="rating-comment">
-            <textarea name="comment" placeholder="Leave your feedback here..."></textarea>
+        <div style="margin-top: 20px;">
+            <label for="comment">Additional Comments:</label>
+            <textarea id="comment" name="comment" rows="4" placeholder="Tell us more about your experience..."></textarea>
         </div>
         
-        <button type="submit" class="rating-submit">Submit Rating</button>
+        <div>
+            <button type="submit" class="submit-btn">Submit Feedback</button>
+        </div>
     </form>
     
-    <div class="rating-result" id="rating-result">
-        Thank you for your feedback!
+    <!-- Success Message -->
+    <div id="rating-result" style="display: none; margin-top: 20px; padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724;">
+        <strong>Thank you!</strong> Your feedback has been submitted successfully.
     </div>
 </div>
 
 {% if user %}
-<div class="user-shipments">
+<div class="user-shipments section">
     <h3>Your Shipments</h3>
     {% if shipments %}
         <table border="1">
@@ -93,7 +283,8 @@
                 <tr>
                     <th>Shipment Number</th>
                     <th>Route</th>
-                    <th>Device</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
                     <th>PO Number</th>
                     <th>NDC Number</th>
                     <th>Serial Number</th>
@@ -109,7 +300,8 @@
                 <tr>
                     <td>{{ shipment.shipmentNumber }}</td>
                     <td>{{ shipment.route }}</td>
-                    <td>{{ shipment.device }}</td>
+                    <td>{{ shipment.origin }}</td>
+                    <td>{{ shipment.destination }}</td>
                     <td>{{ shipment.poNumber }}</td>
                     <td>{{ shipment.ndcNumber }}</td>
                     <td>{{ shipment.serialNumber }}</td>
@@ -129,11 +321,28 @@
 {% endif %}
 
 <script>
+    // Handle rating selection
+    document.querySelectorAll('.rating-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            document.querySelectorAll('.rating-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            
+            // Set the hidden input value
+            document.getElementById('rating').value = this.getAttribute('data-value');
+        });
+    });
+    
+    // Handle form submission
     document.getElementById('rating-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
         // Get selected rating
-        const rating = document.querySelector('input[name="rating"]:checked');
+        const rating = document.getElementById('rating').value;
         const comment = document.querySelector('textarea[name="comment"]').value;
         
         if (!rating) {
@@ -148,7 +357,7 @@
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-                'rating': rating.value,
+                'rating': rating,
                 'comment': comment
             })
         })
@@ -159,7 +368,16 @@
                 document.getElementById('rating-result').style.display = 'block';
                 
                 // Reset form
-                this.reset();
+                document.querySelectorAll('.rating-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.getElementById('rating').value = '';
+                document.querySelector('textarea[name="comment"]').value = '';
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('rating-result').style.display = 'none';
+                }, 5000);
             } else {
                 alert('Error submitting rating: ' + data.message);
             }
@@ -171,56 +389,4 @@
     });
 </script>
 
-<style>
-.btn {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 5px;
-    text-decoration: none;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-.mfa-section {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.error-message {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 5px;
-    padding: 20px;
-    margin: 20px 0;
-    color: #721c24;
-}
-
-.error-message h3 {
-    margin-top: 0;
-}
-</style>
 {% endblock %}

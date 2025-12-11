@@ -21,10 +21,20 @@ async def get_create_shipment_form(request: Request, current_user: dict = Depend
     last_shipment = shipments_collection.find_one(sort=[("shipmentNumber", DESCENDING)])
     if last_shipment and "shipmentNumber" in last_shipment:
         last_id = last_shipment["shipmentNumber"]
-        num_part = int(last_id.replace("exfscm", ""))
-        new_id = f"exfscm{num_part+1:02}"
+        # Handle both old (exfscm) and new (SN) formats
+        if last_id.startswith("SN"):
+            # New format: SN001, SN002, etc.
+            num_part = int(last_id.replace("SN", ""))
+            new_id = f"SN{num_part+1:03}"
+        elif last_id.startswith("exfscm"):
+            # Old format: exfscm01, exfscm02, etc.
+            num_part = int(last_id.replace("exfscm", ""))
+            new_id = f"SN{num_part+1:03}"
+        else:
+            # Fallback for any other format
+            new_id = "SN001"
     else:
-        new_id = "exfscm01"
+        new_id = "SN001"
 
     success_message = request.query_params.get("success")
     error_message = request.query_params.get("error")
@@ -43,7 +53,8 @@ async def get_create_shipment_form(request: Request, current_user: dict = Depend
 async def create_shipment(request: Request,
     shipmentNumber: str = Form(...),
     route: str = Form(...),
-    device: str = Form(...),
+    origin: str = Form(...),
+    destination: str = Form(...),
     poNumber: int = Form(...),  # accept as string first to validate with schema
     ndcNumber: int = Form(...),
     serialNumber: int = Form(...),
@@ -61,7 +72,8 @@ async def create_shipment(request: Request,
         shipment_obj = Shipments(
             shipmentNumber=shipmentNumber,
             route=route,
-            device=device,
+            origin=origin,
+            destination=destination,
             poNumber=poNumber,
             ndcNumber=ndcNumber,
             serialNumber=serialNumber,

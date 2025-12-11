@@ -227,6 +227,134 @@ SCMXpertLite Team</p>
         return False
 
 
+def send_password_reset_confirmation_email(to_email: str) -> bool:
+    """Send a confirmation email after password has been successfully reset."""
+    # Enhanced email content with HTML for better deliverability
+    reset_text = f"""Dear User,
+
+Your password for your SCMXpertLite account has been successfully updated.
+
+If you did not initiate this password change, please contact our support team immediately.
+
+Thank you,
+SCMXpertLite Team"""
+
+    reset_html = f"""<html>
+<head></head>
+<body>
+<h2>SCMXpertLite Password Updated</h2>
+<p>Dear User,</p>
+<p>Your password for your SCMXpertLite account has been successfully updated.</p>
+<p>If you did not initiate this password change, please contact our support team immediately.</p>
+<br>
+<p>Thank you,<br>
+SCMXpertLite Team</p>
+</body>
+</html>"""
+
+    if not SMTP_HOST or not SMTP_PORT or not SMTP_USER or not SMTP_PASS:
+        logger.warning("SMTP not configured - skipping password reset confirmation email.")
+        return True
+
+    try:
+        msg = EmailMessage()
+        msg["Subject"] = "SCMXpertLite - Password Successfully Updated"
+        msg["From"] = FROM_EMAIL
+        msg["To"] = to_email
+        msg.set_content(reset_text)
+        msg.add_alternative(reset_html, subtype='html')
+
+        if SMTP_PORT == 465:
+            server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10)
+        else:
+            server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10)
+            server.starttls()
+        server.login(SMTP_USER, SMTP_PASS)
+        server.send_message(msg)
+        server.quit()
+        logger.info(f"Sent password reset confirmation email to {to_email}")
+        
+        # Log successful email sending
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "sent",
+            "timestamp": datetime.now(timezone.utc),
+            "details": "Password reset confirmation email sent successfully"
+        })
+        return True
+    except smtplib.SMTPRecipientsRefused as e:
+        logger.error(f"SMTP Recipients Refused - Confirmation email not sent to {to_email}: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPRecipientsRefused: {str(e)}"
+        })
+        return False
+    except smtplib.SMTPHeloError as e:
+        logger.error(f"SMTP HELO Error - Server didn't reply properly: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPHeloError: {str(e)}"
+        })
+        return False
+    except smtplib.SMTPSenderRefused as e:
+        logger.error(f"SMTP Sender Refused - From address rejected: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPSenderRefused: {str(e)}"
+        })
+        return False
+    except smtplib.SMTPDataError as e:
+        logger.error(f"SMTP Data Error - Unexpected reply: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPDataError: {str(e)}"
+        })
+        return False
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"SMTP Authentication Error - Username/password refused: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPAuthenticationError: {str(e)}"
+        })
+        return False
+    except smtplib.SMTPException as e:
+        logger.error(f"General SMTP Error: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"SMTPException: {str(e)}"
+        })
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error sending password reset confirmation email to {to_email}: {e}")
+        email_logs_collection.insert_one({
+            "email": to_email,
+            "type": "password_reset_confirmation",
+            "status": "failed",
+            "timestamp": datetime.now(timezone.utc),
+            "details": f"UnexpectedError: {str(e)}"
+        })
+        return False
+
+
 def verify_recaptcha(token: str) -> bool:
     if not RECAPTCHA_SECRET_KEY:
         logger.warning("RECAPTCHA_SECRET_KEY is not set. Skipping verification.")
@@ -649,6 +777,9 @@ def reset_password_post(request: Request, token: str = Form(...), password: str 
         {"$set": {"password_hash": get_password_hash(password), "password_changed_at": datetime.now(timezone.utc)}}
     )
     password_resets_collection.update_one({"_id": doc["_id"]}, {"$set": {"used": True}})
+
+    # Send password reset confirmation email
+    send_password_reset_confirmation_email(doc["email"])
 
     return RedirectResponse(url="/login?message=Password+reset+success", status_code=status.HTTP_303_SEE_OTHER)
 

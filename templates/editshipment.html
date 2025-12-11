@@ -1,56 +1,8 @@
-{% extends "base1.html" %}
+{% extends "base.html" %}
 
 {% block title %}Edit Shipment{% endblock %}
 
 {% block content %}
-<style>
-    .edit-shipment-form {
-        max-width: 600px;
-        margin: 30px auto;
-        padding: 25px;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        background-color: #f4f8fb;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .edit-shipment-form label {
-        display: block;
-        margin-top: 15px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .edit-shipment-form input,
-    .edit-shipment-form select {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #bbb;
-        border-radius: 8px;
-        box-sizing: border-box;
-        background-color: #fff;
-    }
-
-    .edit-shipment-form input[type="submit"] {
-        margin-top: 25px;
-        background-color: #007bff;
-        color: white;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-    }
-
-    .edit-shipment-form input[type="submit"]:hover {
-        background-color: #0056b3;
-    }
-
-    h2 {
-        text-align: center;
-        color: #222;
-    }
-</style>
-
 <h2>Edit Shipment</h2>
 <form method="post" action="/editshipment/{{ shipment._id }}" class="edit-shipment-form">
     <label>Shipment Number:
@@ -59,6 +11,14 @@
 
     <label>Route:
         <select name="route" required>
+            <option value="Chennai-Mumbai" {% if shipment.route == 'Chennai-Mumbai' %}selected{% endif %}>Chennai-Mumbai</option>
+            <option value="Mumbai-Delhi" {% if shipment.route == 'Mumbai-Delhi' %}selected{% endif %}>Mumbai-Delhi</option>
+            <option value="Delhi-Kolkata" {% if shipment.route == 'Delhi-Kolkata' %}selected{% endif %}>Delhi-Kolkata</option>
+            <option value="Kolkata-Chennai" {% if shipment.route == 'Kolkata-Chennai' %}selected{% endif %}>Kolkata-Chennai</option>
+            <option value="Chennai-Hyderabad" {% if shipment.route == 'Chennai-Hyderabad' %}selected{% endif %}>Chennai-Hyderabad</option>
+            <option value="Hyderabad-Bangalore" {% if shipment.route == 'Hyderabad-Bangalore' %}selected{% endif %}>Hyderabad-Bangalore</option>
+            <option value="Bangalore-Delhi" {% if shipment.route == 'Bangalore-Delhi' %}selected{% endif %}>Bangalore-Delhi</option>
+            <option value="Mumbai-Kolkata" {% if shipment.route == 'Mumbai-Kolkata' %}selected{% endif %}>Mumbai-Kolkata</option>
             <option value="Route A" {% if shipment.route == 'Route A' %}selected{% endif %}>Route A</option>
             <option value="Route B" {% if shipment.route == 'Route B' %}selected{% endif %}>Route B</option>
             <option value="Route C" {% if shipment.route == 'Route C' %}selected{% endif %}>Route C</option>
@@ -66,12 +26,12 @@
         </select>
     </label>
 
-    <label>Device:
-        <select name="device" required>
-            <option value="Device 1" {% if shipment.device == 'Device 1' %}selected{% endif %}>Device 1</option>
-            <option value="Device 2" {% if shipment.device == 'Device 2' %}selected{% endif %}>Device 2</option>
-            <option value="Device 3" {% if shipment.device == 'Device 3' %}selected{% endif %}>Device 3</option>
-        </select>
+    <label>Origin:
+        <input type="text" name="origin" value="{{ shipment.origin }}" required>
+    </label>
+
+    <label>Destination:
+        <input type="text" name="destination" value="{{ shipment.destination }}" required>
     </label>
 
     <label>PO Number:
@@ -88,6 +48,12 @@
 
     <label>Goods Type:
         <select name="goods_type" required>
+            <option value="Pharma" {% if shipment.goodsType == 'Pharma' %}selected{% endif %}>Pharma</option>
+            <option value="Food" {% if shipment.goodsType == 'Food' %}selected{% endif %}>Food</option>
+            <option value="Electronics" {% if shipment.goodsType == 'Electronics' %}selected{% endif %}>Electronics</option>
+            <option value="Chemicals" {% if shipment.goodsType == 'Chemicals' %}selected{% endif %}>Chemicals</option>
+            <option value="Textiles" {% if shipment.goodsType == 'Textiles' %}selected{% endif %}>Textiles</option>
+            <option value="Automotive" {% if shipment.goodsType == 'Automotive' %}selected{% endif %}>Automotive</option>
             <option value="Goods1" {% if shipment.goodsType == 'Goods1' %}selected{% endif %}>Goods1</option>
             <option value="Goods2" {% if shipment.goodsType == 'Goods2' %}selected{% endif %}>Goods2</option>
             <option value="Goods3" {% if shipment.goodsType == 'Goods3' %}selected{% endif %}>Goods3</option>
