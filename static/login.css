@@ -1,0 +1,202 @@
+/* Login Page Specific Styles */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-card h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #e0e0e0;
+}
+
+.auth-card p {
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: #cccccc;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+input {
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+button {
+  padding: 15px;
+  background-color: #4a90e2;
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  background-color: #357ae8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.flash {
+  background-color: rgba(255, 0, 0, 0.2);
+  border-left: 5px solid #f44336;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+}
+
+
+/* reCAPTCHA Styles */
+.g-recaptcha {
+  margin: 15px auto;
+  display: flex;
+  justify-content: center;
+}
+
+/* Specific styling for reCAPTCHA container */
+#recaptcha-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  min-height: 74px; /* Ensures space for reCAPTCHA */
+}
+
+.switch-link {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.switch-link a {
+  color: #64b5f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.switch-link a:hover {
+  color: #bbdefb;
+  text-decoration: underline;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  margin: 15px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.google-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+  color: #aaa;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+.divider span {
+  background: rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 2;
+  padding: 0 15px;
+  font-size: 14px;
+}

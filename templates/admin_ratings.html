@@ -1,0 +1,125 @@
+{% extends "base1.html" %}
+
+{% block title %}User Ratings{% endblock %}
+
+{% block content %}
+<div class="user-ratings">
+    <h2>All Feedback & Ratings</h2>
+        <div class="feedback-summary">
+            <span class="user-feedback">User Feedback</span> | 
+            <span class="admin-feedback">Admin Feedback</span>
+        </div>
+    
+    {% if ratings %}
+        <div class="ratings-table-container">
+            <table class="ratings-table">
+                <thead>
+                    <tr>
+                        <th>User Email</th>
+                        <th>User Type</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rating in ratings %}
+                    <tr class="{% if rating.user_role == 'admin' %}admin-row{% else %}user-row{% endif %}">
+                        <td>{{ rating.user_email }}</td>
+                        <td>
+                            {% if rating.user_role == 'admin' %}
+                                <span class="admin-feedback">Admin</span>
+                            {% else %}
+                                <span class="user-feedback">User</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for i in range(1, 6) %}
+                                {% if i <= rating.rating %}
+                                    <span class="star-filled">★</span>
+                                {% else %}
+                                    <span class="star-empty">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                            ({{ rating.rating }}/5)
+                        </td>
+                        <td>{{ rating.comment or 'No comment' }}</td>
+                        <td>{{ rating.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No ratings found.</p>
+    {% endif %}
+</div>
+
+<style>
+.ratings-table-container {
+    width: 95%;
+    margin: 20px auto;
+    overflow-x: auto;
+}
+
+.ratings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.ratings-table th,
+.ratings-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.ratings-table th {
+    background-color: #007BFF;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.ratings-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.star-filled {
+    color: #ffc107;
+    font-size: 1.2em;
+}
+
+.star-empty {
+    color: #ddd;
+    font-size: 1.2em;
+}
+
+.user-feedback {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.admin-feedback {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.user-row {
+    border-left: 4px solid #28a745;
+}
+
+.admin-row {
+    border-left: 4px solid #007bff;
+}
+
+.feedback-summary {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+</style>
+{% endblock %}

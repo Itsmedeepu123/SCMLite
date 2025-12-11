@@ -1,0 +1,76 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %} 
+
+<div class="main-content">
+<h1>Hi User, Welcome to SCMXPertLite</h1>
+
+<!-- Display messages if any -->
+{% if message %}
+<div class="alert alert-info">
+    {{ message }}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="panel-container">
+    <div class="panel left-panel">
+        <h3>Create a New Shipment</h3>
+        <button class="btn"><a href="/create-shipment" style="color: white;">Create Shipment</a></button>
+    </div>
+</div>
+</div>
+
+<style>
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    color: white;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #286090;
+    border-color: #204d74;
+}
+</style>
+{% endblock %}

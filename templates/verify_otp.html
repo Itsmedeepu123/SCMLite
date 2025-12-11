@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Enter Reset Code</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2>Enter Reset Code</h2>
+      <p>We've sent a password reset code to <strong>{{ email }}</strong>.</p>
+      
+      <div class="info-box">
+        <strong>Didn't receive the code?</strong> Check your spam/junk folder or click "Resend Code" below.
+        It may take a few minutes to arrive.
+      </div>
+
+      {% if error %}
+        <div class="flash error">{{ error }}</div>
+      {% elif message %}
+        <div class="flash success">{{ message }}</div>
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="email" value="{{ email }}">
+        <input type="text" name="otp" placeholder="Enter 6-digit code" required>
+        <button type="submit">Verify Code</button>
+      </form>
+
+      <p class="switch-link"><a href="{{ url_for('forgot_password_get') }}">Resend Code</a></p>
+      <p class="switch-link"><a href="{{ url_for('get_login') }}">Back to login</a></p>
+    </div>
+  </div>
+</body>
+</html>

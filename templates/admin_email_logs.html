@@ -1,0 +1,89 @@
+{% extends "base1.html" %}
+
+{% block title %}Email Delivery Logs{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <h2>Email Delivery Logs</h2>
+  
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Timestamp</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in email_logs %}
+        <tr>
+          <td>{{ log.email }}</td>
+          <td>{{ log.type }}</td>
+          <td>
+            <span class="status-badge {{ 'success' if log.status == 'sent' else 'error' }}">
+              {{ log.status }}
+            </span>
+          </td>
+          <td>{{ log.timestamp }}</td>
+          <td>{{ log.details }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="no-data">No email logs found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.status-badge.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+</style>
+{% endblock %}

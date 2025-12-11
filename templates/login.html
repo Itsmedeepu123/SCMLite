@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCMXpertLite - Login</title>
+  <!-- Preconnect to Google for faster loading -->
+  <link rel="preconnect" href="https://www.google.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <!-- Load reCAPTCHA with better performance settings -->
+  <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onloadCallback" async defer onerror="console.error('Failed to load reCAPTCHA script')"></script>
+  <script>
+    // Fallback in case onloadCallback is not triggered
+    setTimeout(function() {
+      if (typeof grecaptcha !== 'undefined' && document.getElementById('recaptcha-container') && !document.getElementById('recaptcha-container').hasChildNodes()) {
+        console.log('Initializing reCAPTCHA manually');
+        try {
+          onloadCallback();
+        } catch (error) {
+          console.error('Error in manual reCAPTCHA initialization:', error);
+        }
+      } else if (typeof grecaptcha === 'undefined') {
+        console.error('reCAPTCHA not loaded after timeout');
+      }
+    }, 2000);
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', path='login.css') }}">
+
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2>SCMXpertLite</h2>
+      <h3>Welcome back!</h3>
+      <p>Please login with your credentials.</p>
+
+      {% if error %}
+        <div class="flash error">{{ error }}</div>
+        <script>
+          // Show popup for rate limit error
+          if ("{{ error }}".includes("Rate limit exceeded")) {
+            alert("Rate limit exceeded: 3 per 1 minute. Please try again later.");
+          }
+        </script>
+      {% elif message %}
+        <div class="flash success">{{ message }}</div>
+        <script>
+          alert("{{ message }}");
+        </script>
+      {% endif %}
+
+      <form method="POST" id="loginForm">
+        <input 
+          type="email" 
+          name="username" 
+          placeholder="Email" 
+          required 
+          value="{{ email_value if email_value else '' }}"
+        >
+        <input type="password" name="password" placeholder="Password" required>
+        <!-- reCAPTCHA container -->
+        <div id="recaptcha-container" class="g-recaptcha"></div>
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+        <button type="submit" id="login-button">Sign In</button>
+      </form>
+      
+      <div class="divider">
+        <span>OR</span>
+      </div>
+      
+      <a href="/auth/google/login" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+        Sign in with Google
+      </a>
+      
+      <p class="switch-link">New here? <a href="{{ url_for('get_signup') }}">Create an account</a></p>
+      <p class="switch-link"><a href="{{ url_for('forgot_password_get') }}">Forgot password?</a></p>
+    </div>
+  </div>
+
+  <script>
+    // Callback function to render reCAPTCHA
+    var onloadCallback = function() {
+      try {
+        grecaptcha.render('recaptcha-container', {
+          'sitekey': '{{ site_key }}',
+          'theme': 'light',
+          'size': 'normal',
+          'callback': function(response) {
+            // Set the reCAPTCHA response in the hidden input field
+            document.getElementById('g-recaptcha-response').value = response;
+            console.log('reCAPTCHA solved with response:', response);
+            
+            // Also update any other potential fields with the same name
+            var hiddenFields = document.querySelectorAll('input[name="g-recaptcha-response"]');
+            for (var i = 0; i < hiddenFields.length; i++) {
+              hiddenFields[i].value = response;
+            }
+          }
+        });
+        console.log('reCAPTCHA rendered successfully');
+      } catch (error) {
+        console.error('Error rendering reCAPTCHA:', error);
+      }
+    };
+    
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      // Check if reCAPTCHA response is present
+      var recaptchaResponse = document.getElementById('g-recaptcha-response').value;
+      console.log('reCAPTCHA response:', recaptchaResponse);
+      
+      // Additional check to ensure the field exists in the form data
+      var recaptchaField = document.querySelector('input[name="g-recaptcha-response"]');
+      console.log('reCAPTCHA field in form:', recaptchaField);
+      
+      if (!recaptchaResponse || recaptchaResponse.length === 0) {
+        e.preventDefault();
+        alert('Please complete the reCAPTCHA challenge');
+        return false;
+      }
+      
+      // Form will submit normally with reCAPTCHA response
+      console.log('Form data being submitted with reCAPTCHA');
+      return true;
+    });
+    
+    // Enable the login button only after reCAPTCHA is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // This is just for debugging purposes
+      console.log('DOM fully loaded');
+    });
+  </script>
+</body>
+</html>
