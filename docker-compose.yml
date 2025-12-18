@@ -1,64 +1,86 @@
+version: "3.9"
 
 services:
   fastapi_app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: f_app
     ports:
       - "8000:8000"
-    depends_on:
-      - mongo
-      - kafka
     env_file:
       - .env
-   
-  zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - "2181:2181"
+    restart: unless-stopped
 
   kafka:
-    image: wurstmeister/kafka
+    image: bitnamilegacy/kafka:latest
+    container_name: kafka
     ports:
       - "9092:9092"
-      - "29092:29092"  # External access for local producers/consumers
+      - "29092:29092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_HEAP_OPTS: "-Xmx256M -Xms128M"
-    
+      # Enable KRaft
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_NODE_ID: 1
 
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
-    
+      # Controller quorum
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # Listeners
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      # Auto topic creation
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+      # Topic creation at startup
+      KAFKA_CREATE_TOPICS: "sensor_data:1:1"
+
+      # Optional tuning
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+
+    restart: unless-stopped
+
 
   socket:
-    build: ./kafka/socket  # Path to socket server
-    depends_on:
-      - kafka
+    build:
+      context: ./kafka/socket
+      dockerfile: Dockerfile
+    container_name: skt
     ports:
       - "5050:5050"
-    
+    depends_on:
+      - kafka
+    restart: unless-stopped
 
   producer:
-    build: ./kafka/producer  # Path to producer folder
+    build:
+      context: ./kafka/producer
+      dockerfile: Dockerfile
+    container_name: pdc
+    env_file:
+      - ./kafka/producer/.env
     depends_on:
       - kafka
       - socket
-    
+    restart: unless-stopped
 
   consumer:
-    build: ./kafka/consumer  # Path to consumer folder
+    build:
+      context: ./kafka/consumer
+      dockerfile: Dockerfile
+    container_name: cns
     depends_on:
       - kafka
-      - producer
-      - mongo
     environment:
-      # MongoDB Atlas connection for consumer
-      - DATABASE_URL=mongodb+srv://deepa:deepa123@cluster0.ppja1aq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-    
-
-
+      # IMPORTANT: use Docker mongo, not Atlas, inside compose
+      - .env
+    restart: unless-stopped

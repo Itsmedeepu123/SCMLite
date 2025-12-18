@@ -11,7 +11,7 @@ SERVER = 'socket'  # Docker service name for the server
 PORT = 5050
 ADDR = (SERVER, PORT)
 KAFKA_BROKER = 'kafka:9092'
-KAFKA_TOPIC = 'sensor-data' # Make sure this matches the consumer
+KAFKA_TOPIC = 'sensor_data' # Make sure this matches the consumer
 
 # Define the format used by the server for the length prefix (MUST MATCH SERVER)
 LENGTH_STRUCT_FORMAT = '!Q' # !Q = 8 bytes unsigned long long
