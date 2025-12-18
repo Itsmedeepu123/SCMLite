@@ -11,7 +11,7 @@ import requests
 from jose import JWTError, jwt # Import JWT handling
 from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv # Import dotenv
-from routes import createshipment, manage_users , allshipments , kafka_data_streaming, user
+from routes import createshipment, manage_users , allshipments , kafka_data_streaming, auth_routes, google_sso_routes, password_routes, mfa_routes, profile_routes, admin_routes, api_routes
 from pymongo import DESCENDING
 import threading
 import time
@@ -30,7 +30,7 @@ app = FastAPI()
 async def custom_rate_limit_exceeded_handler(request, exc):
     # For login page, redirect back with error message
     if "/login" in str(request.url):
-        return RedirectResponse(url="/login?error=Rate limit exceeded: 3 per 1 minute", status_code=303)
+        return RedirectResponse(url="/login?error=Rate limit exceeded:Too many login attempts. Please try again after some time", status_code=303)
     # For other routes, use the default handler
     return _rate_limit_exceeded_handler(request, exc)
 
@@ -55,9 +55,16 @@ client = MongoClient(MONGO_URI)
 
 app.include_router(manage_users.router,tags=["Manage users"])
 app.include_router(allshipments.router,tags=["all shipments"])
-app.include_router(user.router,tags=["users"])
+app.include_router(auth_routes.router,tags=["Authentication"])
+app.include_router(google_sso_routes.router,tags=["Google SSO"])
+app.include_router(password_routes.router,tags=["Password Management"])
+app.include_router(mfa_routes.router,tags=["MFA"])
+app.include_router(profile_routes.router,tags=["User Profile"])
+app.include_router(admin_routes.router,tags=["Admin"])
+app.include_router(api_routes.router,tags=["API"])
 app.include_router(createshipment.router,tags=["create shipment"])
 app.include_router(kafka_data_streaming.router,tags=["kafka"])
+
 
 
 

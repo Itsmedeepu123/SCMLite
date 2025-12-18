@@ -39,7 +39,7 @@
         <script>
           // Show popup for rate limit error
           if ("{{ error }}".includes("Rate limit exceeded")) {
-            alert("Rate limit exceeded: 3 per 1 minute. Please try again later.");
+            alert("Rate limit exceeded:Too many login attempts. Please try again after some time");
           }
         </script>
       {% elif message %}
